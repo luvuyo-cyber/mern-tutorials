@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(
   cors({
     //option 2: allow custom origins (only client with this origin can access our server)
-    origin: "http://localhost:3000",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-type"],
   })
