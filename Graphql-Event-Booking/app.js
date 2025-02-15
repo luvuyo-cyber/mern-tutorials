@@ -9,6 +9,49 @@ const bcrypt = require("bcryptjs");
 
 const app = express();
 app.use(bodyParser.json()); //to process incoming json bodies
+
+//Looks up a user by their ID and prepares a way (via a function) to get the events they created
+const user = (userId) => {
+  //find the user by Id
+  return User.findById(userId)
+    .then((user) => {
+      //return an object with all the users data
+      return {
+        ...user._doc,
+        id: user.id,
+        //fetches all the events that the user has created
+        //The bind method is used here to "pre-load" the function with the list of event IDs from "user._doc.createdEvents"
+        //This way, when GraphQL needs to know the details of those events, it calls the function and gets them
+        createdEvents: events.bind(this, user._doc.createdEvents),
+      };
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+//Looks up events by a list of IDs and prepares a way (via a function) to get the creator details for each event
+const events = (eventIds) => {
+  //The $in operator tells the database to look for events whose IDs are in the given list
+  return Event.find({
+    _id: { $in: eventIds },
+  })
+    .then((events) => {
+      return events.map((event) => {
+        return {
+          ...event._doc,
+          _id: event.id,
+          //It also sets up a property called creator for each event
+          //This property is a function created with bind that, when called, will fetch the user who created that event (using the user function)
+          creator: user.bind(this, event.creator),
+        };
+      });
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
 app.use(
   "/graphql", //create route to handle graphQL requests
   graphqlHttp({
@@ -20,12 +63,14 @@ app.use(
                 description:    String!
                 price:  Float!
                 date:   String!
+                creator:  User!
         }
 
         type User {
                 _id: ID!
                 email: String!
                 password: String
+                createdEvents:  [Event!]
         }
         
         input EventInput    {
@@ -59,15 +104,27 @@ app.use(
       //returns hard coded list of strings
       events: () => {
         //return our events
-        return Event.find()
-          .then((events) => {
-            return events.map((event) => {
-              return { ...event._doc, _id: event.id }; //convert our mongodb id to normal string
-            });
-          })
-          .catch((err) => {
-            throw err;
-          });
+        return (
+          Event.find()
+            // .populate("creator") //populate: populates any relations we have, our case, the creator field
+            .then((events) => {
+              return events.map((event) => {
+                return {
+                  ...event._doc,
+                  _id: event.id, //convert our mongodb id to normal string
+                  creator: user.bind(this, event._doc.creator), //get our creator id
+
+                  // creator: {
+                  //   ...event._doc.creator._doc, //get our creator doc
+                  //   _id: event._doc.creator.id,
+                  // },
+                };
+              });
+            })
+            .catch((err) => {
+              throw err;
+            })
+        );
       },
       //takes an argument and returns it back
       //Create a new event in the database and link it to a specific user
