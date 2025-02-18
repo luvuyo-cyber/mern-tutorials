@@ -4,9 +4,11 @@ const graphqlHttp = require("express-graphql");
 const mongoose = require("mongoose");
 const graphQLSchema = require("./graphql/schema/index");
 const graphQLResolvers = require("./graphql/resolvers/index");
+const isAuth = require("./middleware/is-auth");
 
 const app = express();
 app.use(bodyParser.json()); //to process incoming json bodies
+app.use(isAuth); //authentication middleware
 
 app.use(
   "/graphql", //create route to handle graphQL requests
