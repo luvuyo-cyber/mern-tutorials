@@ -21,9 +21,17 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-//password is hashed prior to saving
-userSchema.pre("save", async function () {
-  this.password = await bcrypt.hash(this.password, 12);
+//password is hashed prior to saving only if it was modified
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+  try {
+    this.password = await bcrypt.hash(this.password, 12);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);

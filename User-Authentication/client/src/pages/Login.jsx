@@ -35,23 +35,30 @@ const Login = () => {
         {
           ...inputValue,
         },
-        { withCredentials: true }
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
-      console.log(data);
-      const { success, message } = data;
-      if (success) {
-        handleSuccess(message);
+
+      if (data.success) {
+        handleSuccess(data.message);
         setTimeout(() => {
           navigate("/");
         }, 1000);
       } else {
-        handleError(message);
+        handleError(data.message);
       }
     } catch (error) {
-      console.log(error);
+      if (error.response) {
+        handleError(error.response.data.message);
+      } else {
+        handleError("An error occurred during login");
+      }
     }
     setInputValue({
-      ...inputValue,
       email: "",
       password: "",
     });
@@ -69,6 +76,7 @@ const Login = () => {
             value={email}
             placeholder="Enter your email"
             onChange={handleOnChange}
+            required
           />
         </div>
         <div>
@@ -79,6 +87,7 @@ const Login = () => {
             value={password}
             placeholder="Enter your password"
             onChange={handleOnChange}
+            required
           />
         </div>
         <button type="submit">Submit</button>

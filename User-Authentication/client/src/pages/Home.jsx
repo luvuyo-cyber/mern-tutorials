@@ -13,32 +13,44 @@ const Home = () => {
     const verifyCookie = async () => {
       if (!cookies.token) {
         navigate("/login");
+        return;
       }
-      const { data } = await axios.post(
-        "http://localhost:4000",
-        {},
-        { withCredentials: true }
-      );
-      const { status, user } = data;
-      setUsername(user);
-      return status
-        ? toast(`Hello ${user}`, {
+
+      try {
+        const { data } = await axios.post(
+          "http://localhost:4000",
+          {},
+          { withCredentials: true }
+        );
+
+        if (data.status) {
+          setUsername(data.user);
+          toast(`Hello ${data.user}`, {
             position: "top-right",
-          })
-        : (removeCookie("token"), navigate("/login"));
+          });
+        } else {
+          removeCookie("token");
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Verification error:", error);
+        removeCookie("token");
+        navigate("/login");
+      }
     };
+
     verifyCookie();
   }, [cookies, navigate, removeCookie]);
 
   const Logout = () => {
     removeCookie("token");
-    navigate("/signup");
+    navigate("/login");
   };
+
   return (
     <>
       <div className="home_page">
         <h4>
-          {" "}
           Welcome <span>{username}</span>
         </h4>
         <button onClick={Logout}>LOGOUT</button>

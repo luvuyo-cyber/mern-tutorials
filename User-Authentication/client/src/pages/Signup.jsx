@@ -49,9 +49,9 @@ const Signup = () => {
 
       if (success) {
         handleSuccess(message);
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        // Wait for the cookie to be set
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        navigate("/");
       } else {
         handleError(message);
       }
@@ -84,24 +84,26 @@ const Signup = () => {
         <div>
           <label htmlFor="username">Username</label>
           <input
-          type="text"
-          name="username"
-          value={username}
-          placeholder="Enter your username"
-          onChange={handleOnChange} />
+            type="text"
+            name="username"
+            value={username}
+            placeholder="Enter your username"
+            onChange={handleOnChange}
+          />
         </div>
         <div>
-        <label htmlFor="password">Password</label>
+          <label htmlFor="password">Password</label>
           <input
-          type="password"
-          name="password"
-          value={password}
-          placeholder="Enter your password"
-          onChange={handleOnChange} />
+            type="password"
+            name="password"
+            value={password}
+            placeholder="Enter your password"
+            onChange={handleOnChange}
+          />
         </div>
         <button type="submit">Submit</button>
         <span>
-            Already have an account? <Link to={"/login"}>Login</Link>
+          Already have an account? <Link to={"/login"}>Login</Link>
         </span>
       </form>
       <ToastContainer />
