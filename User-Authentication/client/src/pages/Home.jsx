@@ -20,7 +20,12 @@ const Home = () => {
         const { data } = await axios.post(
           "http://localhost:4000",
           {},
-          { withCredentials: true }
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         );
 
         if (data.status) {
@@ -42,9 +47,21 @@ const Home = () => {
     verifyCookie();
   }, [cookies, navigate, removeCookie]);
 
-  const Logout = () => {
-    removeCookie("token");
-    navigate("/login");
+  const Logout = async () => {
+    try {
+      // Clear the cookie
+      removeCookie("token", { path: "/" });
+
+      // Reset the username state
+      setUsername("");
+
+      // Navigate to login page
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Force navigation even if there's an error
+      navigate("/login", { replace: true });
+    }
   };
 
   return (

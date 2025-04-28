@@ -1,15 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
+import { useCookies } from "react-cookie";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [cookies] = useCookies([]);
   const [inputValue, setInputValue] = useState({
     email: "",
     password: "",
   });
   const { email, password } = inputValue;
+
+  // Check if user is already logged in
+  useEffect(() => {
+    if (cookies.token) {
+      navigate("/");
+    }
+  }, [cookies, navigate]);
+
   const handleOnChange = (e) => {
     const { name, value } = e.target;
     setInputValue({
@@ -17,15 +27,6 @@ const Login = () => {
       [name]: value,
     });
   };
-
-  const handleError = (err) =>
-    toast.error(err, {
-      position: "bottom-left",
-    });
-  const handleSuccess = (msg) =>
-    toast.success(msg, {
-      position: "bottom-left",
-    });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,19 +45,11 @@ const Login = () => {
       );
 
       if (data.success) {
-        handleSuccess(data.message);
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
-      } else {
-        handleError(data.message);
+        navigate("/", { replace: true });
       }
     } catch (error) {
-      if (error.response) {
-        handleError(error.response.data.message);
-      } else {
-        handleError("An error occurred during login");
-      }
+      // Silently handle the error without showing toast
+      console.error("Login error:", error);
     }
     setInputValue({
       email: "",
@@ -95,7 +88,6 @@ const Login = () => {
           Don't have an account? <Link to={"/signup"}>Signup</Link>
         </span>
       </form>
-      <ToastContainer />
     </div>
   );
 };

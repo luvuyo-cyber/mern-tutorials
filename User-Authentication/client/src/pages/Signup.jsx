@@ -1,15 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { useCookies } from "react-cookie";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [cookies] = useCookies([]);
   const [inputValue, setInputValue] = useState({
     email: "",
     password: "",
     username: "",
   });
+
+  // Check if user is already logged in
+  useEffect(() => {
+    if (cookies.token) {
+      navigate("/");
+    }
+  }, [cookies, navigate]);
 
   const { email, password, username } = inputValue;
   const handleOnChange = (e) => {
@@ -17,18 +25,6 @@ const Signup = () => {
     setInputValue({
       ...inputValue,
       [name]: value,
-    });
-  };
-
-  const handleError = (err) => {
-    toast.error(err, {
-      position: "bottom-left",
-    });
-  };
-
-  const handleSuccess = (msg) => {
-    toast.success(msg, {
-      position: "bottom-right",
     });
   };
 
@@ -42,25 +38,21 @@ const Signup = () => {
         },
         {
           withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
 
-      const { success, message } = data;
-
-      if (success) {
-        handleSuccess(message);
-        // Wait for the cookie to be set
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        navigate("/");
-      } else {
-        handleError(message);
+      if (data.success) {
+        navigate("/", { replace: true });
       }
     } catch (error) {
-      console.log(error);
+      // Silently handle the error without showing toast
+      console.error("Signup error:", error);
     }
 
     setInputValue({
-      ...inputValue,
       email: "",
       password: "",
       username: "",
@@ -79,6 +71,7 @@ const Signup = () => {
             value={email}
             placeholder="Enter your email"
             onChange={handleOnChange}
+            required
           />
         </div>
         <div>
@@ -89,6 +82,7 @@ const Signup = () => {
             value={username}
             placeholder="Enter your username"
             onChange={handleOnChange}
+            required
           />
         </div>
         <div>
@@ -99,6 +93,7 @@ const Signup = () => {
             value={password}
             placeholder="Enter your password"
             onChange={handleOnChange}
+            required
           />
         </div>
         <button type="submit">Submit</button>
@@ -106,7 +101,6 @@ const Signup = () => {
           Already have an account? <Link to={"/login"}>Login</Link>
         </span>
       </form>
-      <ToastContainer />
     </div>
   );
 };
