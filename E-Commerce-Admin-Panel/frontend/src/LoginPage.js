@@ -21,6 +21,8 @@ function LoginPage() {
 
       // Save token to localStorage
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("role", response.data.role);
+      localStorage.setItem("name", response.data.name);
 
       // Redirect to dashboard
       navigate("/dashboard");
