@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
+import Navbar from "../components/Navbar";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,7 +11,6 @@ const Login = () => {
     email: "",
     password: "",
   });
-  const { email, password } = inputValue;
 
   // Check if user is already logged in
   useEffect(() => {
@@ -20,6 +19,7 @@ const Login = () => {
     }
   }, [cookies, navigate]);
 
+  const { email, password } = inputValue;
   const handleOnChange = (e) => {
     const { name, value } = e.target;
     setInputValue({
@@ -48,9 +48,9 @@ const Login = () => {
         navigate("/", { replace: true });
       }
     } catch (error) {
-      // Silently handle the error without showing toast
       console.error("Login error:", error);
     }
+
     setInputValue({
       email: "",
       password: "",
@@ -58,37 +58,60 @@ const Login = () => {
   };
 
   return (
-    <div className="form_container">
-      <h2>Login Account</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={email}
-            placeholder="Enter your email"
-            onChange={handleOnChange}
-            required
-          />
+    <>
+      <Navbar />
+      <div className="container mt-5">
+        <div className="row justify-content-center">
+          <div className="col-md-6">
+            <div className="card">
+              <div className="card-body">
+                <h2 className="card-title text-center mb-4">Login</h2>
+                <form onSubmit={handleSubmit}>
+                  <div className="mb-3">
+                    <label htmlFor="email" className="form-label">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      name="email"
+                      value={email}
+                      placeholder="Enter your email"
+                      onChange={handleOnChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="password" className="form-label">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      name="password"
+                      value={password}
+                      placeholder="Enter your password"
+                      onChange={handleOnChange}
+                      required
+                    />
+                  </div>
+                  <div className="d-grid">
+                    <button type="submit" className="btn btn-primary">
+                      Login
+                    </button>
+                  </div>
+                </form>
+                <div className="text-center mt-3">
+                  <p>
+                    Don't have an account? <Link to="/signup">Signup</Link>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            placeholder="Enter your password"
-            onChange={handleOnChange}
-            required
-          />
-        </div>
-        <button type="submit">Submit</button>
-        <span>
-          Don't have an account? <Link to={"/signup"}>Signup</Link>
-        </span>
-      </form>
-    </div>
+      </div>
+    </>
   );
 };
 
