@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./index.css";
 
 function CartPage() {
   const [cart, setCart] = useState([]);
@@ -34,56 +35,48 @@ function CartPage() {
   };
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "20px" }}>
-      <h1 style={{ fontSize: "28px", marginBottom: "20px" }}>Your Cart</h1>
+    <div className="container cart-container">
+      <h1>Your Cart</h1>
 
       {cart.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
         <>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              marginBottom: "20px",
-            }}
-          >
+          <table className="table">
             <thead>
               <tr>
-                <th style={thStyle}>Product</th>
-                <th style={thStyle}>Price</th>
-                <th style={thStyle}>Quantity</th>
-                <th style={thStyle}>Total</th>
-                <th style={thStyle}>Action</th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {cart.map((item) => (
                 <tr key={item._id}>
-                  <td style={tdStyle}>{item.title}</td>
-                  <td style={tdStyle}>${item.price}</td>
-                  <td style={tdStyle}>
+                  <td>{item.title}</td>
+                  <td>${item.price}</td>
+                  <td>
                     <button
                       onClick={() => updateQuantity(item._id, -1)}
-                      style={qtyBtnStyle}
+                      className="qty-button"
                     >
                       −
                     </button>
                     <span style={{ margin: "0 10px" }}>{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item._id, 1)}
-                      style={qtyBtnStyle}
+                      className="qty-button"
                     >
                       +
                     </button>
                   </td>
-                  <td style={tdStyle}>
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </td>
-                  <td style={tdStyle}>
+                  <td>${(item.price * item.quantity).toFixed(2)}</td>
+                  <td>
                     <button
                       onClick={() => removeFromCart(item._id)}
-                      style={removeButtonStyle}
+                      className="button remove-button"
                     >
                       Remove
                     </button>
@@ -94,18 +87,7 @@ function CartPage() {
           </table>
 
           <h3 style={{ textAlign: "right" }}>Total: ${getTotalPrice()}</h3>
-          <a
-            href="/checkout"
-            style={{
-              display: "inline-block",
-              marginTop: "20px",
-              padding: "10px 20px",
-              backgroundColor: "green",
-              color: "white",
-              textDecoration: "none",
-              borderRadius: "4px",
-            }}
-          >
+          <a href="/checkout" className="button checkout-button">
             Proceed to Checkout
           </a>
         </>
@@ -113,35 +95,5 @@ function CartPage() {
     </div>
   );
 }
-
-const thStyle = {
-  border: "1px solid #ccc",
-  padding: "10px",
-  backgroundColor: "#f2f2f2",
-  textAlign: "left",
-};
-
-const tdStyle = {
-  border: "1px solid #ccc",
-  padding: "10px",
-};
-
-const removeButtonStyle = {
-  padding: "6px 12px",
-  backgroundColor: "red",
-  color: "white",
-  border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
-};
-
-const qtyBtnStyle = {
-  padding: "4px 10px",
-  backgroundColor: "#ccc",
-  border: "none",
-  borderRadius: "4px",
-  fontSize: "16px",
-  cursor: "pointer",
-};
 
 export default CartPage;

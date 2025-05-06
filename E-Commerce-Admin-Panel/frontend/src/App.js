@@ -1,4 +1,7 @@
+// Importing necessary components and modules from React Router and local files
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+// Importing page components for different parts of the app
 import LoginPage from "./LoginPage";
 import DashboardPage from "./DashboardPage";
 import ShopPage from "./ShopPage";
